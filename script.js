@@ -1,15 +1,23 @@
-const socket = io('https://socket-sms-backend.onrender.com'); // 👈 replace with your actual Render backend URL
+// Connect to backend socket server
+const socket = io('https://textbee-render.onrender.com');
 
-const smsList = document.getElementById('smsList');
-smsList.innerHTML = 'Connecting to server...';
+// DOM elements
+const input = document.getElementById('message');
+const sendBtn = document.getElementById('sendBtn');
+const messagesDiv = document.getElementById('messages');
 
-socket.on('connect', () => {
-  smsList.innerHTML = '';
-  console.log('✅ Connected to backend via socket.io');
+// Send message on button click
+sendBtn.addEventListener('click', () => {
+  const msg = input.value.trim();
+  if (msg) {
+    socket.emit('message', msg); // send to server
+    input.value = '';
+  }
 });
 
-socket.on('new_sms', (msg) => {
-  const li = document.createElement('li');
-  li.innerHTML = `<strong>${msg.from}</strong><br>${msg.body}<br><small>${msg.timestamp}</small>`;
-  smsList.prepend(li);
+// Receive message from server
+socket.on('message', (msg) => {
+  const p = document.createElement('p');
+  p.textContent = msg;
+  messagesDiv.appendChild(p);
 });
